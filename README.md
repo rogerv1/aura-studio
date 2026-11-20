@@ -25,9 +25,9 @@ O arquivo `.github/workflows/ci.yml` prepara o GitHub Actions para instalar as d
 
 1. Edite a marca, textos, serviços, perguntas, mensagens e SEO em `src/config/site.ts`. Mantenha os identificadores dos serviços únicos. Atualize a saudação do WhatsApp ao trocar de marca.
 2. Ajuste as cores em `src/app/globals.css`. As fontes Cormorant Garamond e Inter são servidas localmente pelo projeto.
-3. Substitua a imagem em `public/` e atualize caminho e texto alternativo em `src/config/site.ts`.
+3. Substitua as quatro imagens WebP em `public/` e atualize os caminhos, as larguras e o texto alternativo em `src/config/site.ts`. Elas são usadas no `srcSet` para que cada navegador escolha uma imagem adequada à tela.
 4. Copie `.env.example` para `.env.local`. Preencha `WHATSAPP_NUMBER` com país, DDD e número, só dígitos. Sem número válido, os botões exibem uma prévia local da mensagem. Com um número válido, os botões abrem o WhatsApp com a origem da consulta preenchida.
-5. Informe `SITE_URL` com o domínio definitivo incluindo https://. Defina `SITE_INDEXABLE=true` após revisar o site e confirmar o domínio e o número. Gere um novo build ao alterar essas configurações.
+5. Informe `SITE_URL` com o endereço completo incluindo https:// e o caminho, caso exista. Defina `SITE_INDEXABLE=true` após revisar o site. Gere um novo build ao alterar essas configurações. A publicação desta demonstração no GitHub Pages configura essas variáveis em `.github/workflows/pages.yml`.
 
 ## Adaptação semanal · até 6 horas
 

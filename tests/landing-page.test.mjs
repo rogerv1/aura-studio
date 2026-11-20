@@ -71,19 +71,20 @@ test("a página apresenta idioma, título principal e descrição", () => {
 });
 
 test("a imagem principal está disponível", async () => {
-  const imagePath = html.match(/imageSrcSet="\/_next\/image\?url=([^&"]+)/)?.[1];
+  const imagePath = html.match(/<img\b[^>]*\bsrc="([^"]+)"/)?.[1];
   assert.ok(imagePath, "A imagem principal deve ser informada.");
-  const response = await fetch(new URL(decodeURIComponent(imagePath), baseUrl));
+  const response = await fetch(new URL(imagePath, baseUrl));
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type"), /^image\//);
+  assert.match(html, /<img\b[^>]*\bfetchPriority="high"/);
+  assert.match(html, /<img\b[^>]*\bsrcSet="[^"]+ 640w,[^"]+ 768w,[^"]+ 960w,[^"]+ 1122w"/);
 });
 
-test("a conversão e a indexação seguem o cenário configurado no build", async () => {
-  const commercial = process.env.SITE_INDEXABLE === "true";
+test("os botões de contato seguem o número configurado no build", () => {
   const links = [...html.matchAll(/href="(https:\/\/wa\.me\/[^"]+)"/g)]
     .map((match) => new URL(match[1].replaceAll("&amp;", "&")));
 
-  if (commercial) {
+  if (process.env.WHATSAPP_NUMBER) {
     assert.ok(links.length > 0, "A página deve oferecer contato por WhatsApp.");
     for (const link of links) {
       assert.equal(link.pathname, `/${process.env.WHATSAPP_NUMBER}`);
@@ -92,15 +93,25 @@ test("a conversão e a indexação seguem o cenário configurado no build", asyn
     const serviceName = html.match(/<article\b[^>]*>[\s\S]*?<h3\b[^>]*>([^<]+)<\/h3>/)?.[1];
     assert.ok(serviceName, "Deve haver um serviço na página.");
     assert.ok(links.some((link) => link.searchParams.get("text").includes(serviceName)));
-    assert.match(html, /<meta name="robots" content="index, follow"/);
-    const canonical = html.match(/rel="canonical" href="([^"]+)"/)?.[1];
-    assert.equal(new URL(canonical).origin, new URL(process.env.SITE_URL).origin);
-    const sitemap = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
-    assert.ok(sitemap.includes(`<loc>${new URL(process.env.SITE_URL).origin}/</loc>`));
   } else {
     assert.equal(links.length, 0);
     assert.match(html, /href="#demo-in%C3%ADcio"/);
     assert.match(html, /id="demo-início"/);
+  }
+});
+
+test("a indexação e o endereço canônico seguem o cenário configurado no build", async () => {
+  if (process.env.SITE_INDEXABLE === "true" && process.env.SITE_URL) {
+    assert.match(html, /<meta name="robots" content="index, follow"/);
+    const canonical = html.match(/rel="canonical" href="([^"]+)"/)?.[1];
+    const expected = new URL(process.env.SITE_URL);
+    if (!expected.pathname.endsWith("/")) expected.pathname += "/";
+    assert.equal(new URL(canonical).href, expected.href);
+    const sitemap = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
+    assert.ok(sitemap.includes(`<loc>${expected.href}</loc>`));
+    const robots = await (await fetch(`${baseUrl}/robots.txt`)).text();
+    assert.ok(robots.includes(`Sitemap: ${new URL("sitemap.xml", expected).href}`));
+  } else {
     assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
     const sitemap = await (await fetch(`${baseUrl}/sitemap.xml`)).text();
     assert.doesNotMatch(sitemap, /<loc>/);

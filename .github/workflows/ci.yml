@@ -23,6 +23,10 @@ jobs:
             whatsapp: "5511999999999"
             site_url: "https://example.com"
             indexavel: "true"
+          - cenario: demonstracao-indexavel
+            whatsapp: ""
+            site_url: "https://example.com/aura-studio/"
+            indexavel: "true"
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       WHATSAPP_NUMBER: ${{ matrix.whatsapp }}
@@ -49,6 +53,8 @@ jobs:
     env:
       GITHUB_PAGES: "true"
       NEXT_TELEMETRY_DISABLED: "1"
+      SITE_URL: "https://rogerv1.github.io/aura-studio/"
+      SITE_INDEXABLE: "true"
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
@@ -61,8 +67,4 @@ jobs:
         run: npm run build
       - name: Verificar arquivos publicados
         run: |
-          test -s out/index.html
-          test -s out/robots.txt
-          test -s out/sitemap.xml
-          test -s out/aura-facial.jpg
-          grep -q '/aura-studio/aura-facial.jpg' out/index.html
+          node tests/check-static.mjs

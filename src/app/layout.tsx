@@ -6,7 +6,7 @@ import { indexable, site, siteUrl } from "@/config/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  ...(siteUrl && { metadataBase: siteUrl, alternates: { canonical: "/" } }),
+  ...(siteUrl && { metadataBase: siteUrl, alternates: { canonical: siteUrl.href } }),
   title: site.seo.title,
   description: site.seo.description,
   robots: { index: indexable, follow: indexable },

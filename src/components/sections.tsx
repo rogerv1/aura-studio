@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { site } from "@/config/site";
 import { WhatsAppLink } from "./whatsapp";
@@ -18,7 +17,17 @@ export function Hero() {
           <WhatsAppLink source="início" label={site.contact.cta} />
         </div>
         <div className="relative aspect-[5/4] overflow-hidden rounded-t-[6rem] rounded-b-3xl bg-sand sm:rounded-t-[9rem] lg:aspect-[1.06]">
-          <Image src={site.hero.image} alt={site.hero.alt} fill preload sizes="(min-width: 1280px) 550px, (min-width: 1024px) 48vw, 94vw" className="object-cover object-center" />
+          <img
+            src={site.hero.image}
+            srcSet={site.hero.imageSrcSet}
+            sizes="(min-width: 1280px) 550px, (min-width: 1024px) 48vw, 94vw"
+            alt={site.hero.alt}
+            width={1122}
+            height={1402}
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
         </div>
       </Container>
     </section>

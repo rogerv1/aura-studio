@@ -48,6 +48,8 @@ jobs:
         env:
           GITHUB_PAGES: "true"
           NEXT_TELEMETRY_DISABLED: "1"
+          SITE_URL: "https://rogerv1.github.io/aura-studio/"
+          SITE_INDEXABLE: "true"
 
       - name: Preparar arquivos para publicação
         uses: actions/upload-pages-artifact@v4

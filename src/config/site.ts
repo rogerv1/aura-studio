@@ -4,7 +4,10 @@ export const site = {
   hero: {
     title: "Sua beleza merece um cuidado especial.",
     description: "Reserve um tempo para você. Conheça nossos cuidados faciais e corporais e encontre o atendimento que combina com a sua rotina.",
-    image: `${process.env.GITHUB_PAGES === "true" ? "/aura-studio" : ""}/aura-facial.jpg`,
+    image: `${process.env.GITHUB_PAGES === "true" ? "/aura-studio" : ""}/aura-facial-960.webp`,
+    imageSrcSet: [640, 768, 960, 1122]
+      .map((width) => `${process.env.GITHUB_PAGES === "true" ? "/aura-studio" : ""}/aura-facial-${width}.webp ${width}w`)
+      .join(", "),
     alt: "Mulher de olhos fechados recebendo um cuidado facial em uma maca de linho",
   },
   services: [
@@ -40,12 +43,23 @@ export const site = {
 
 const rawPhone = process.env.WHATSAPP_NUMBER?.trim() ?? "";
 const rawUrl = process.env.SITE_URL?.trim();
-const parsedUrl = rawUrl ? new URL(rawUrl) : undefined;
-export const siteUrl = parsedUrl && ["https:", "http:"].includes(parsedUrl.protocol)
-  ? new URL(parsedUrl.origin)
-  : undefined;
+function parseSiteUrl(value: string | undefined): URL | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    if (!["https:", "http:"].includes(url.protocol)) return undefined;
+    url.search = "";
+    url.hash = "";
+    if (!url.pathname.endsWith("/")) url.pathname += "/";
+    return url;
+  } catch {
+    return undefined;
+  }
+}
+
+export const siteUrl = parseSiteUrl(rawUrl);
 
 export const whatsappNumber = /^[1-9][0-9]{7,14}$/.test(rawPhone) ? rawPhone : "";
-export const indexable = Boolean(siteUrl && whatsappNumber && process.env.SITE_INDEXABLE === "true");
+export const indexable = Boolean(siteUrl && process.env.SITE_INDEXABLE === "true");
 
 
