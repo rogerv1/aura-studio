@@ -32,8 +32,16 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Restaurar cache do Next.js
+        uses: actions/cache@v5
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-pages-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'next.config.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-pages-next-${{ hashFiles('package-lock.json') }}-
+
       - name: Preparar GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Gerar a página estática
         run: npm run build
