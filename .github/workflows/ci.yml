@@ -1,0 +1,44 @@
+name: Verificações
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    name: Build e testes (${{ matrix.cenario }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cenario: demonstracao
+            whatsapp: ""
+            site_url: ""
+            indexavel: "false"
+          - cenario: comercial
+            whatsapp: "5511999999999"
+            site_url: "https://example.com"
+            indexavel: "true"
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      WHATSAPP_NUMBER: ${{ matrix.whatsapp }}
+      SITE_URL: ${{ matrix.site_url }}
+      SITE_INDEXABLE: ${{ matrix.indexavel }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Verificar tipos
+        run: npm run typecheck
+      - name: Gerar versão de produção
+        run: npm run build
+      - name: Testar página de produção
+        run: npm test
